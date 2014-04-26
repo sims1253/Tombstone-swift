@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="OpenCL Wrapper : Fast OpenCL Programming using C++ features" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>OpenCL Wrapper</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/ti6csb/OpenCL-Wrapper">View on GitHub</a>
+
+          <h1 id="project_title">OpenCL Wrapper</h1>
+          <h2 id="project_tagline">Fast OpenCL Programming using C++ features</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/ti6csb/OpenCL-Wrapper/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/ti6csb/OpenCL-Wrapper/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>
+<a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction.</h2>
+
+<p>"OpenCL is the first open, royalty-free standard for cross-platform, parallel programming of modern processors found in personal computers, servers and handheld/embedded devices." The OpenCL standard defines an API and also provides a programming language (C-dialect if you want) with which application specific functions (called kernels) can be defined. All in all, the standard provides a convenient way to write task and data-parallel programs for a heterogeneous computing environment. Given the necessary OpenCL library from some vendors, one can choose the desired platform and let some of its kernels run on the devices of the platform. For more details, see <a href="http://www.khronos.org/opencl/">http://www.khronos.org/opencl/</a>.</p>
+
+<h2>
+<a name="motivation" class="anchor" href="#motivation"><span class="octicon octicon-link"></span></a>Motivation</h2>
+
+<p>However, the utilization of the API of the OpenCL Standard can be tedious. Loading kernels and compiling for different divices and platforms requires many lines of code. This blog is for everyone who is interested in fast OpenCL programming. You only need to download, fork or clone an OpenCL wrapper at <a href="https://github.com/ti6csb/OpenCL-Wrapper">https://github.com/ti6csb/OpenCL-Wrapper</a> which takes the burden of all the unconvenient function calls and pointer stuff. Many C++11 features have been used to provide a comfortable API. It requires only a tiny OpenCL wrapper which covers most of the OpenCL standard but provides you with C++ Objects. You will have the following benefits if you use this wrapper.</p>
+
+<ul>
+<li>
+<strong>One-To-One mapping</strong> of OpenCL and C++ objects. You won't need any extra work to understand the wrapper nomenclature if you are acquainted with the OpenCL concepts.</li>
+<li>
+<strong>Fast instantiation</strong> of all available platforms and devices. Querying and printing is a one-liner.</li>
+<li>Object instantation and allocation is managed by the <strong>RAII principle</strong>. Just instantiate the C++ object and don't worry about any memory leakage or deallocation.</li>
+<li>
+<strong>Fast integration</strong> of data-parallel kernels. Write you kernels in separate files pass them to the program. All file handling is done for you.</li>
+<li>All examples have <strong>less than 50 lines</strong> of code even if you have to manage multiple events. You will start to write your kernels within the next hours and test your data-parallel algorithm.</li>
+</ul><h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<h3>
+<a name="preliminary" class="anchor" href="#preliminary"><span class="octicon octicon-link"></span></a>Preliminary</h3>
+
+<ul>
+<li>You need to install and locate the OpenCL library</li>
+<li>You need to have a g++ version &gt;= 4.7</li>
+<li>You need to have git and pull from <a href="https://github.com/ti6csb/OpenCL-Wrapper">https://github.com/ti6csb/OpenCL-Wrapper</a>
+</li>
+</ul><h3>
+<a name="create-library" class="anchor" href="#create-library"><span class="octicon octicon-link"></span></a>Create Library</h3>
+
+<p>Once you know where your OpenCL library from your vendor is located, you only need to </p>
+
+<ol>
+<li>Adjust the library.mk and fill in the library location. You will see already some common paths for Intel, AMD and Nvidia on Linux platforms.</li>
+<li>Let OPENCL_WRAPPER_DIR be the location of the cloned project. Then just </li>
+</ol><pre><code>cd $OPENCL_WRAPPER_DIR/Code
+make
+</code></pre>
+
+<p>Now the static library oclWrapper.a is build in $OPENCL_WRAPPER_DIR/Code/lib and you may integrate it.</p>
+
+<h3>
+<a name="create-examples" class="anchor" href="#create-examples"><span class="octicon octicon-link"></span></a>Create Examples</h3>
+
+<p>Once you have build the library, you can build the examples. Then just</p>
+
+<pre><code>cd $OPENCL_WRAPPER_DIR/Tutorial 
+make
+</code></pre>
+
+<p>Note that the makefiles read the library.mk, so adjusting the library.mk is enough.</p>
+
+<h3>
+<a name="tutorials" class="anchor" href="#tutorials"><span class="octicon octicon-link"></span></a>Tutorials</h3>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">OpenCL Wrapper maintained by <a href="https://github.com/ti6csb">ti6csb</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
