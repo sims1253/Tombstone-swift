@@ -94,3 +94,6 @@ target_link_libraries(minimum OclWrapper ${OPENCL_LIBRARIES})
 
 add_executable(image Tutorial/10.image/image.cpp)
 target_link_libraries(image OclWrapper ${OPENCL_LIBRARIES})
+
+add_executable(multi Tutorial/11.multi/multi.cpp)
+target_link_libraries(multi OclWrapper ${OPENCL_LIBRARIES})
