@@ -33,4 +33,5 @@ clean :
 	$(MAKE) clean -C 8.matrix
 	$(MAKE) clean -C 9.minimum
 	$(MAKE) clean -C 10.image
+	$(MAKE) clean -C 11.multi
 
