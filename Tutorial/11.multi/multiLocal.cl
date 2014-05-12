@@ -7,7 +7,8 @@ __kernel void multiLocal(const int rowDim, const int colDim, const int common, _
 	int iloc = get_local_id(0);
 	int nloc = get_local_size(0);
 
-	T *Aprivate = (T) malloc(sizeof(T)*rowDim);
+	T *Aprivate;
+	Aprivate = malloc(sizeof(T)*rowDim);
 	T temp;
 
 	//Row major Format
