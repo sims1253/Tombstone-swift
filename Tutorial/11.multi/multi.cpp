@@ -12,10 +12,10 @@
 #define UNIT_TEST 1
 
 typedef float Type;
-typedef utl::Matrix <Type,utl::column_major_tag> Matrix;
-typedef utl::Ones <Type,utl::column_major_tag> Ones;
-typedef utl::Zeros <Type,utl::column_major_tag> Zeros;
-typedef utl::Rand <Type,utl::column_major_tag, utl::uniform_dist_tag> Rand;
+typedef utl::Matrix <Type,utl::row_major_tag> Matrix;
+typedef utl::Ones <Type,utl::row_major_tag> Ones;
+typedef utl::Zeros <Type,utl::row_major_tag> Zeros;
+typedef utl::Rand <Type,utl::row_major_tag, utl::uniform_dist_tag> Rand;
 
 int main(int argc, char* argv[])
 {
@@ -106,8 +106,11 @@ int main(int argc, char* argv[])
 
     //call kernel
     
+    //Pointer for local memory
+    float *localMem = 
+
     //for(int f=0;f<10;f++){
-    kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id()); //d_matrix_E ist sonst B
+    kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id(), sizeof(Type)*common); //d_matrix_E ist sonst B
     queue.finish();
     // }
 
