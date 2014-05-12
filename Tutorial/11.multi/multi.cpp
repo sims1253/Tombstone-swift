@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
     Type correctVal = 0;
     for (int correctTest = 0; correctTest < rows; correctTest++)
     {
-        correctVal += h_matrix_A.at(0, correctTest) * h_matrix_B.at(correctTest, 0);
+        correctVal += h_matrix_A.at(0, correctTest) * h_matrix_E.at(correctTest, 0);
     }
     if(correctVal == *h_matrix_C.begin()) std::cout << "Computation was correct. new" << std::endl;
     else std::cout << "Computation was incorrect! new" << std::endl;
