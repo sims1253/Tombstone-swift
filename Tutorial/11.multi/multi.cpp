@@ -79,11 +79,6 @@ int main(int argc, char* argv[])
     
     auto h_matrix_C = Zeros(rows,cols);
 
-
-    //std::cout << "Matrix(A) before computation: " << std::endl << h_matrix_A << std::endl;
-    //std::cout << "Matrix(B) before computation: " << std::endl << h_matrix_B << std::endl;
-    //std::cout << "Matrix(C) before computation: " << std::endl << h_matrix_C << std::endl;
-
     //create Buffers on device
     ocl::Buffer d_matrix_A (context, size_bytes_A);
     //if(UNIT_TEST){
@@ -111,10 +106,10 @@ int main(int argc, char* argv[])
 
     //call kernel
     
-    for(int f=0;f<10;f++){
+    //for(int f=0;f<10;f++){
     kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id()); //d_matrix_E ist sonst B
     queue.finish();
-    }
+    // }
 
 
     //timer end
@@ -127,12 +122,20 @@ int main(int argc, char* argv[])
     //std::cout << "Matrix(C) after computation : " << std::endl << "A = " << h_matrix_C << std::endl;
     if(UNIT_TEST){
         if(h_matrix_A ==  h_matrix_C){
-            std::cout << "Computation was correct!" << std::endl;
+            std::cout << "Computation was correct! old" << std::endl;
         }else{
-            std::cout << "Computation was NOT correct!" << std::endl;
+            std::cout << "Computation was NOT correct! old" << std::endl;
         }
     }
 
+
+    Type correctVal = 0;
+    for (int correctTest = 0; correctTest < rows; correctTest++)
+    {
+        correctVal += h_matrix_A.at(0, correctTest) * h_matrix_B.at(correctTest, 0);
+    }
+    if(correctVal == *h_matrix_C.begin()) std::cout << "Computation was correct. new" << std::endl;
+    else std::cout << "Computation was incorrect! new" << std::endl;
 
     return 0;
 }
