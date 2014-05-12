@@ -1,5 +1,5 @@
 template<class T>
-__kernel void multiLocal(const int rowDim, const int colDim, const int common, __global T *A, __global T *B, __global T *C, __local, *T BlocalMem)
+__kernel void multiLocal(const int rowDim, const int colDim, const int common, __global T *A, __global T *B, __global T *C, __local *T BlocalMem)
 {
 	int j,k;
 
@@ -17,7 +17,7 @@ __kernel void multiLocal(const int rowDim, const int colDim, const int common, _
 
 	for(j=0; j<colDim;j++){
 		for(k=iloc;k<common;k+=nloc){
-			localMem[k]=B[k*common+j];
+			BlocalMem[k]=B[k*common+j];
 		}
 	}
 
