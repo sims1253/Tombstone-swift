@@ -1,5 +1,5 @@
 template<class T>
-__kernel void multiLocal(const int rowDim, const int colDim, const int common, __global T *A, __global T *B, __global T *C, __local *T BlocalMem)
+__kernel void multiLocal(const int rowDim, const int colDim, const int common, __global T *A, __global T *B, __global T *C, __local T *BlocalMem)
 {
 	int j,k;
 
@@ -7,7 +7,7 @@ __kernel void multiLocal(const int rowDim, const int colDim, const int common, _
 	int iloc = get_local_id(0);
 	int nloc = get_local_size(0);
 
-	T *Aprivate = malloc(sizeof(T)*rowDim);
+	T *Aprivate = (T) malloc(sizeof(T)*rowDim);
 	T temp;
 
 	//Row major Format
