@@ -45,12 +45,12 @@ int main(int argc, char* argv[])
     // as the kernel is templated, creates kernel for single and integer types
     ocl::Program program(context, utl::type::Single | utl::type::Int);
     // inserts kernels into the program.
-    std::ifstream file("11.multi/multi.cl");
+    std::ifstream file("11.multi/multiLocal.cl");
     program << file;
     // kernels are created and program is built for the context.
     program.build();
 
-    ocl::Kernel &kernel = program.kernel("multi", utl::type::Single);
+    ocl::Kernel &kernel = program.kernel("multiLocal", utl::type::Single);
 
     // set the dimensions
     size_t rows = 1<<11, cols = 1<<11, common = 1<<11;
