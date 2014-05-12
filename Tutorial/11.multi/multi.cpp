@@ -63,6 +63,7 @@ int main(int argc, char* argv[])
     size_t size_bytes_B = elements_B * sizeof(Type);
     size_t size_bytes_C = elements_C * sizeof(Type);
     size_t size_bytes_E = elements_E * sizeof(Type);
+    size_t size_bytes_local_mem = common * sizeof(Type);
 
     kernel.setWorkSize(16,16, rows, cols);
 
@@ -81,6 +82,9 @@ int main(int argc, char* argv[])
 
     //create Buffers on device
     ocl::Buffer d_matrix_A (context, size_bytes_A);
+
+    //
+    ocl::Buffer d_local_mem (context, size_bytes_A);
     //if(UNIT_TEST){
         ocl::Buffer d_matrix_E (context,size_bytes_E);
     /*
@@ -106,11 +110,9 @@ int main(int argc, char* argv[])
 
     //call kernel
     
-    //Pointer for local memory
-    float *localMem = 
 
     //for(int f=0;f<10;f++){
-    kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id(), sizeof(Type)*common); //d_matrix_E ist sonst B
+    kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id(), d_local_mem.id()); //d_matrix_E ist sonst B
     queue.finish();
     // }
 
