@@ -23,11 +23,13 @@ __kernel void multiLocal(const int rowDim, const int colDim, const int common, _
 
 	barrier(CLK_LOCAL_MEM_FENCE);
 
-	tmp=0.0f;
+	temp=0.0f;
 
 	for(k=0; k<common;k++){
-		tmp+=Aprivate[k]*BlocalMem[k];
+		temp+=Aprivate[k]*BlocalMem[k];
 	}
-	C[i*colDim+j] += tmp;
+	C[i*colDim+j] += temp;
+
+	free(Aprivate);
 }
 
