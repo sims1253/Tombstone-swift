@@ -40,12 +40,12 @@ int main(int argc, char* argv[])
     //types
     ocl::Program program(context, utl::type::Single | utl::type::Int);
     // inserts kernels into the program.
-    std::ifstream file("11.multi/multiLocal.cl");
+    std::ifstream file("11.multi/multiPrivate.cl");
     program << file;
     // kernels are created and program is built for the context.
     program.build();
 
-    ocl::Kernel &kernel = program.kernel("multiLocal", utl::type::Single);
+    ocl::Kernel &kernel = program.kernel("multiPrivate", utl::type::Single);
 
     // set the dimensions
     size_t rows = 1<<9, cols = 1<<9, common = 1<<9;
@@ -59,6 +59,8 @@ int main(int argc, char* argv[])
     size_t size_bytes_C = elements_C * sizeof(Type);
     size_t size_bytes_E = elements_E * sizeof(Type);
     size_t size_bytes_local_mem = 256;
+
+    using Timer = utl::Timer<utl::MilliSeconds>;
 
     kernel.setWorkSize(16,16, rows, cols);
 
@@ -101,27 +103,29 @@ int main(int argc, char* argv[])
     d_matrix_C.write(queue, 0, h_matrix_C.data(), size_bytes_C);
 
     //timer start
-    utl::Timer::tic();
+    Timer::tic();
 
     //call kernel
     
 
     //for(int f=0;f<10;f++){
     kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(),
-     d_matrix_E.id(), d_matrix_C.id(), size_bytes_local_mem); 
+     d_matrix_E.id(), d_matrix_C.id()); 
      //d_matrix_E ist sonst B
     queue.finish();
     // }
 
 
     //timer end
-    utl::Timer::toc();
+    Timer::toc();
 
     //write result from device buffer to host mem
     d_matrix_C.read(queue, h_matrix_C.data(), size_bytes_C);
-utl::Timer::tic();
-    std::cout << "Time elapsed: " << 
-    utl::Seconds(utl::Timer::elapsed(execute)) << std::endl;
+
+//    timer.tic();
+    std::cout << "Time elapsed: " << Timer::elapsed() << std::endl;
+  
+/*
     //std::cout << "Matrix(C) after computation : 
     //" << std::endl << "A = " << h_matrix_C << std::endl;
     if(UNIT_TEST){
@@ -142,8 +146,9 @@ utl::Timer::tic();
     if(correctVal == *h_matrix_C.begin()) std::cout << 
         "Computation was correct. new" << std::endl;
     else std::cout << "Computation was incorrect! new" << std::endl;
-utl::Timer::toc();
-std::cout << "Time elapsed test: " << 
-    utl::Seconds(utl::Timer::elapsed(execute)) << std::endl;
+    timer.toc();
+    std::cout << "Time elapsed test: " << 
+    utl::Seconds(timer.elapsed(execute)) << std::endl;
+  */  
     return 0;
 }
