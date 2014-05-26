@@ -40,15 +40,15 @@ int main(int argc, char* argv[])
     //types
     ocl::Program program(context, utl::type::Single | utl::type::Int);
     // inserts kernels into the program.
-    std::ifstream file("11.multi/multiPrivate.cl");
+    std::ifstream file("11.multi/multiLocal.cl");
     program << file;
     // kernels are created and program is built for the context.
     program.build();
 
-    ocl::Kernel &kernel = program.kernel("multiPrivate", utl::type::Single);
+    ocl::Kernel &kernel = program.kernel("multiLocal", utl::type::Single);
 
     // set the dimensions
-    size_t rows = 1<<9, cols = 1<<9, common = 1<<9;
+    size_t rows = 1<<12, cols = 1<<12, common = 1<<12;
 
     size_t elements_A = rows*common;
     //size_t elements_B = common*cols;
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
     //size_t size_bytes_B = elements_B * sizeof(Type);
     size_t size_bytes_C = elements_C * sizeof(Type);
     size_t size_bytes_E = elements_E * sizeof(Type);
-    size_t size_bytes_local_mem = 256;
+    size_t size_bytes_local_mem = common;
 
     using Timer = utl::Timer<utl::MilliSeconds>;
 
