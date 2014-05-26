@@ -28,15 +28,15 @@ for(k=0;k<common;k++){
 Aprivate[k] = A[i*colDim+k];
 }
 
-// copy from global memory to local memory
-for(j=0; j<colDim;j++){
-	temp=0.0f;
+	// copy from global memory to local memory
+	for(j=0; j<colDim;j++){
+		temp=0.0f;
 
-// calculates
-for(k=0; k<common;k++){
-temp+=Aprivate[k]*B[k*common+j];
-}
-C[i*colDim+j] += temp;
+		// calculates
+		for(k=0; k<common;k++){
+			temp+=Aprivate[k]*B[k*common+j];
+		}
+		C[i*colDim+j] += temp;
 
-}
+	}
 }
