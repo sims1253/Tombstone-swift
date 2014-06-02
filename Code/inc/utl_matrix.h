@@ -46,14 +46,14 @@ class __MatrixBase
 {
 public:
 
-    typedef typename std::vector<T>::pointer           pointer;
-    typedef typename std::vector<T>::const_pointer     const_pointer;
-    typedef typename std::vector<T>::reference         reference;
-    typedef typename std::vector<T>::const_reference   const_reference;
-    typedef typename std::vector<T>::value_type        value_type;
+	typedef typename std::vector<T>::pointer           pointer;
+	typedef typename std::vector<T>::const_pointer     const_pointer;
+	typedef typename std::vector<T>::reference         reference;
+	typedef typename std::vector<T>::const_reference   const_reference;
+	typedef typename std::vector<T>::value_type        value_type;
 
-    typedef typename std::vector<T>::iterator          iterator;
-    typedef typename std::vector<T>::const_iterator    const_iterator;
+	typedef typename std::vector<T>::iterator          iterator;
+	typedef typename std::vector<T>::const_iterator    const_iterator;
 
 
     __MatrixBase& operator = (value_type value) { std::fill(this->begin(), this->end(), value); return *this; }
@@ -61,9 +61,13 @@ public:
     __MatrixBase& operator = (__MatrixBase&& m) { _vector = std::move(m._vector); _rows = m._rows; _cols = m._cols; return *this; }
 
 
-    bool operator==(const_reference value) {
+	bool operator==(const_reference value) const {
         return std::all_of(this->begin(), this->end(), [value](const_reference ref){return ref == value;});
     }
+
+	bool operator!=(const_reference value) const {
+		return std::all_of(this->begin(), this->end(), [value](const_reference ref){return ref != value;});
+	}
 
 
     bool operator==(const __MatrixBase& m) const {
@@ -71,10 +75,20 @@ public:
         return std::equal(this->begin(), this->end(), m.begin());
     }
 
+	bool operator!=(const __MatrixBase& m) const {
+		if(m.dim() != this->dim()) return true;
+		return std::equal(this->begin(), this->end(), m.begin(), std::not_equal_to<value_type>() );
+	}
+
     bool operator==(__MatrixBase&& m) {
         if(m.dim() != this->dim()) return false;
         return std::equal(this->begin(), this->end(), m.begin());
     }
+
+	bool operator!=(__MatrixBase&& m) {
+		if(m.dim() != this->dim()) return true;
+		return std::equal(this->begin(), this->end(), m.begin(), std::not_equal_to<value_type>());
+	}
 
     __MatrixBase operator*(const_reference value) const
     {
@@ -82,6 +96,7 @@ public:
         std::for_each(res.begin(), res.end(), [value]( reference r){ r *= value; });
         return res;
     }
+
 
     __MatrixBase operator+(const_reference value) const
     {
@@ -160,7 +175,7 @@ protected:
     __MatrixBase(size_t rows, size_t cols) :  _vector(rows*cols), _rows(rows), _cols(cols) {}
     __MatrixBase(const __MatrixBase& m) : _vector(m._vector), _rows(m._rows), _cols(m._cols) {}
     __MatrixBase(__MatrixBase&& m) : _vector(std::move(m._vector)), _rows(m._rows), _cols(m._cols) {}
-    __MatrixBase() = default;
+	__MatrixBase() : _vector(), _rows(0u), _cols(0u) {}
 
 
 
@@ -171,19 +186,37 @@ protected:
     size_t _cols;
 };
 
+}
+
+
+
+
+namespace utl{
+
 ///  Marking column_major matrices.
 struct column_major_tag { };
 
 ///  Marking row_major matrices.
 struct row_major_tag  { };
 
+}
+
+
+
+
+
+namespace utl{
 
 template <class T, class F>
 class Matrix : private __MatrixBase<T>
 {
     Matrix() = delete;
 };
+}
 
+
+
+namespace utl{
 
 
 template <class T>
@@ -206,12 +239,22 @@ public :
     Matrix(size_t rows, size_t cols) :  Base(rows,cols) {}
     Matrix(const Matrix& m) : Base(m) {}
     Matrix(Matrix&& m) : Base(std::move(m)) {}
-    Matrix() = default;
+	Matrix() : Base() {}
     ~Matrix() = default;
 
     Matrix& operator = (value_type value) { Base::operator=( value ); return *this; }
     Matrix& operator = (const Matrix& m) { Base::operator=( m ); return *this; }
     Matrix& operator = (Matrix&& m) { Base::operator=( std::move(m) ) ;  return *this; }
+
+
+	bool operator==(const Matrix& m) const { return Base::operator ==( m ); }
+	bool operator!=(const Matrix& m) const { return Base::operator !=( m ); }
+
+	bool operator==(Matrix&& m) { return Base::operator ==( std::move(m) ); }
+	bool operator!=(Matrix&& m) { return Base::operator !=( std::move(m) ); }
+
+	bool operator==(const_reference m) const { return Base::operator ==( m ); }
+	bool operator!=(const_reference m) const { return Base::operator !=( m ); }
 
 
     Matrix operator*(const_reference value) const { return Base::operator*(value);  }
@@ -221,32 +264,70 @@ public :
     Matrix operator-(const Matrix& rhs) const     { return Base::operator-(rhs);   }
     Matrix operator/(const_reference value) const { return Base::operator/(value); }
 
-    Matrix operator*(const Matrix& rhs) const
+	Matrix operator*(const Matrix& B) const
     {
-        const Matrix& lhs = *this;
-        TRUE_ASSERT(lhs.cols() == rhs.rows(), "LhsMatrix.cols() != RhsMatrix.rows()");
-        Matrix res(lhs.rows(), rhs.cols());
 
 
-        auto itRhsCol = rhs.begin(), itRhsColEnd = rhs.begin() + rhs.cols() * rhs.rows();
-        auto itResCol = res.begin();
-        auto itLhsRowEnd = lhs.begin() + lhs.rows();
+		const Matrix& A = *this;
+		TRUE_ASSERT(A.cols() == B.rows(), "LhsMatrix.cols() != RhsMatrix.rows()");
 
-        for(; itRhsCol != itRhsColEnd; itRhsCol += rhs.rows(), itResCol += res.rows())
-        {
-            auto itLhsRow = lhs.begin();
-            auto itResRow = itResCol;
-            for(; itLhsRow != itLhsRowEnd; ++itLhsRow, ++itResRow)
-            {
-                auto itLhsCol = itLhsRow;
-                auto itRhsRow = itRhsCol;
-                auto itRhsRowEnd = itRhsRow + rhs.rows();
-                for(; itRhsRow != itRhsRowEnd; itLhsCol += lhs.rows(), ++itRhsRow){
-                    *itResRow += *itLhsCol * *itRhsRow;
-                }
-            }
-        }
-        return res;
+		const size_t M = A.rows();
+		const size_t N = B.cols();
+		const size_t K = A.cols();
+
+
+		Matrix C(M, N);
+
+
+//		auto nB = B.begin(), nBEnd = rhs.begin() + K*N;
+//		auto nC = C.begin();
+//		auto mBEnd = A.begin() + M;
+
+//		for(; nB != nBEnd; nB += K, nC += M)
+//		{
+//			auto mA = A.begin();
+//			auto mC = nC;
+
+//			for(; mA != mAEnd; ++mA, ++mC)
+//			{
+//				auto kA = mA;
+//				auto kB = nB;
+//				auto kBEnd = kB + K;
+
+//				for(; kB != kBEnd; kA += M, ++kB){
+//					*mC += *kA * *kB;
+//				}
+//			}
+//		}
+//		return C;
+
+
+		auto nB = B.begin();
+		auto nBEnd = nB + K*N;
+		auto nC = C.begin();
+
+		for(; nB != nBEnd; nB += K, nC += M)
+		{
+			auto kA = A.begin();
+			auto kB = nB;
+
+			auto kBEnd = kB + K;
+
+			for(; kB != kBEnd; kA += M, ++kB)
+			{
+
+				auto mA = kA;
+				auto mC = nC;
+
+				auto mAEnd = mA + M;
+
+				for(; mA != mAEnd; ++mA, ++mC)
+				{
+					*mC += *mA * *kB;
+				}
+			}
+		}
+		return C;
     }
 
 
@@ -291,6 +372,18 @@ private:
 };
 }
 
+
+template<class T>
+bool operator==(typename utl::Matrix<T,utl::column_major_tag>::const_reference value, const utl::Matrix<T,utl::column_major_tag>& matrix) {
+	return matrix == value;
+}
+
+template<class T>
+bool operator!=(typename utl::Matrix<T,utl::column_major_tag>::const_reference value, const utl::Matrix<T,utl::column_major_tag>& matrix) {
+	return matrix != value;
+}
+
+
 namespace utl{
 template <class T>
 class Matrix<T, row_major_tag> : public __MatrixBase<T>
@@ -311,9 +404,17 @@ public :
     Matrix(size_t rows, size_t cols) :  Base(rows,cols) {}
     Matrix(const Matrix& m) : Base(m) {}
     Matrix(Matrix&& m) : Base(std::move(m)) {}
-    Matrix() = default;
+	Matrix() : Base() {}
     ~Matrix() = default;
 
+	bool operator==(const Matrix& m) const { return Base::operator ==( m ); }
+	bool operator!=(const Matrix& m) const { return Base::operator !=( m ); }
+
+	bool operator==(Matrix&& m) { return Base::operator ==( std::move(m) ); }
+	bool operator!=(Matrix&& m) { return Base::operator !=( std::move(m) ); }
+
+	bool operator==(const_reference m) const { return Base::operator ==( m ); }
+	bool operator!=(const_reference m) const { return Base::operator !=( m ); }
 
     Matrix& operator = (value_type value) { Base::operator=( value ); return *this; }
     Matrix& operator = (const Matrix& m) { Base::operator=( m ); return *this; }
@@ -327,32 +428,65 @@ public :
     Matrix operator-(const Matrix& rhs) const     { return Base::operator-(rhs); }
     Matrix operator/(const_reference value) const { return Base::operator/(value); }
 
-    Matrix operator*(const Matrix& rhs) const
+	Matrix operator*(const Matrix& B) const
     {
-        const Matrix& lhs = *this;
-        TRUE_ASSERT(lhs.cols() == rhs.rows(), "LhsMatrix.cols() != RhsMatrix.rows()");
-        Matrix res(lhs.rows(), rhs.cols());
+		const Matrix& A = *this;
+		TRUE_ASSERT(A.cols() == B.rows(), "LhsMatrix.cols() != RhsMatrix.rows()");
 
 
-        auto itRhsCol = rhs.begin(), itRhsColEnd = rhs.begin() + rhs.cols();
-        auto itResCol = res.begin();
-        auto itLhsRowEnd = lhs.begin() + lhs.cols() * lhs.rows();
+		const size_t M = A.rows();
+		const size_t N = B.cols();
+		const size_t L = A.cols();
 
-        for(; itRhsCol != itRhsColEnd; ++itRhsCol, ++itResCol)
-        {
-            auto itLhsRow = lhs.begin();
-            auto itResRow = itResCol;
-            for(; itLhsRow != itLhsRowEnd; itLhsRow += lhs.cols(), itResRow += res.cols())
-            {
-                auto itLhsCol = itLhsRow;
-                auto itRhsRow = itRhsCol;
-                auto itRhsRowEnd = itRhsRow + rhs.cols() * rhs.rows();
-                for(; itRhsRow != itRhsRowEnd; ++itLhsCol, itRhsRow += rhs.cols()){
-                    *itResRow += *itLhsCol * *itRhsRow;
-                }
-            }
-        }
-        return res;
+		Matrix C(M, N);
+
+
+//		auto nB = B.begin(), nBEnd = B.begin() + N;
+//		auto nC = C.begin();
+//		auto mAEnd = A.begin() + K * M;
+
+//		for(; nB != nBEnd; ++nB, ++nC)
+//		{
+//			auto mA = A.begin();
+//			auto mC = nC;
+//			for(; mA != mAEnd; mA += K, mC += N)
+//			{
+//				auto kA = mA;
+//				auto kB = nB;
+//				auto kBEnd = kB + N * K;
+//				for(; kB != kBEnd; ++kA, kB += N){
+//					*mC += *kA * *kB;
+//				}
+//			}
+//		}
+//		return C;
+
+		auto mA = A.begin();
+		auto mC = C.begin();
+
+		auto kBEnd = B.begin() + L * N;
+		auto mAEnd = A.begin() + M * L;
+
+		for(; mA != mAEnd; mA += L, mC += N)
+		{
+			auto kA = mA;
+			auto kB = B.begin();
+
+			for(; kB != kBEnd; ++kA, kB += N)
+			{
+				auto nC = mC;
+				auto nB = kB;
+				auto nBEnd = nB + N;
+
+				for(; nB != nBEnd; ++nB, ++nC)
+				{
+					*nC += *kA * *nB;
+				}
+
+			}
+		}
+
+		return C;
     }
 
 
@@ -398,6 +532,18 @@ private:
     }
 };
 }
+
+
+template<class T>
+bool operator==(typename utl::Matrix<T,utl::row_major_tag>::const_reference value, const utl::Matrix<T,utl::row_major_tag>& matrix) {
+	return matrix == value;
+}
+
+template<class T>
+bool operator!=(typename utl::Matrix<T,utl::row_major_tag>::const_reference value, const utl::Matrix<T,utl::row_major_tag>& matrix) {
+	return matrix != value;
+}
+
 
 #include <random>
 #include <limits>
@@ -546,6 +692,25 @@ public :
     Zeros(size_t rows, size_t cols) :
         utl::Matrix<T,F>(rows, cols, value_type(0))
     {}
+};
+
+template <class T, class F>
+class Eye : public Matrix<T,F>
+{
+public :
+	typedef typename Matrix<T,F>::value_type        value_type;
+	Eye(size_t rows, size_t cols) :
+		utl::Matrix<T,F>(rows, cols, value_type(0))
+	{
+		const auto M = rows, N = cols;
+		for(auto n = 0u; n < N; ++n)
+		{
+			for(auto m = 0u; m < M; ++m)
+			{
+				if(m == n) this->at(m,n) = value_type(1);
+			}
+		}
+	}
 };
 
 
