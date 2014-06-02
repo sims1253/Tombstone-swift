@@ -6,7 +6,7 @@ LIBS:="$(OCL_WRAPPER_LIB) $(OCL_LIB) $(OGL_LIB)"
 
 GCC_FLAGS:="-std=c++11 -Wall -O3"
 
-all: platform context queue program buffer kernel events matrix minimum image profile
+all: platform context queue program buffer kernel events matrix minimum image profile multi
 
 platform: 1.platform/platform.cpp
 	$(MAKE) -C 1.platform LIBS=$(LIBS) INCS=$(INCS) GCC_FLAGS=$(GCC_FLAGS)

@@ -3,6 +3,8 @@ OCL_INC=
 
 NVIDIA:=1
 
+INTEL:=1
+
 ifdef INTEL
 	OCL_LIB += -L/usr/lib64 -lOpenCL
 	OCL_INC += -I/usr/include
