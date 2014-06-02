@@ -40,12 +40,14 @@ int main(int argc, char* argv[])
     //types
     ocl::Program program(context, utl::type::Single | utl::type::Int);
     // inserts kernels into the program.
-    std::ifstream file("12.multi/multiLocal.cl");
+    //std::ifstream file("12.multi/multiLocal.cl");
+    std::ifstream file("12.multi/supermulti.cl");
     program << file;
     // kernels are created and program is built for the context.
     program.build();
 
-    ocl::Kernel &kernel = program.kernel("multiLocal", utl::type::Single);
+    //ocl::Kernel &kernel = program.kernel("multiLocal", utl::type::Single);
+    ocl::Kernel &kernel = program.kernel("GpuMatrixMul", utl::type::Single);
 
     // set the dimensions
     size_t rows = 1<<12, cols = 1<<12, common = 1<<12;
@@ -59,10 +61,13 @@ int main(int argc, char* argv[])
     size_t size_bytes_C = elements_C * sizeof(Type);
     size_t size_bytes_E = elements_E * sizeof(Type);
     size_t size_bytes_local_mem = common;
+    size_t global_mem = rows*cols;
 
     using Timer = utl::Timer<utl::MilliSeconds>;
 
     kernel.setWorkSize(16,16, rows, cols);
+    //kernel.setGlobalSize(global_mem,1);
+    //kernel.setLocalSize(16,2);
 
     //create host matrices
     auto h_matrix_A  = Rand(rows,common);
@@ -109,8 +114,9 @@ int main(int argc, char* argv[])
     
 
     //for(int f=0;f<10;f++){
-    kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(),
-     d_matrix_E.id(), d_matrix_C.id()); 
+    // kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id());
+    kernel(queue, d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id(),int(rows),int(common),int(cols));
+
      //d_matrix_E ist sonst B
     queue.finish();
     // }
