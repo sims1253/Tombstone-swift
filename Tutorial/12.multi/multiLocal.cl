@@ -28,6 +28,7 @@ __local T Bs   [16][16];
 	    As[ti][tj] = A[ nk*(gi   ) + tj + ok ];   // A[i][k]
 	    Bs[ti][tj] = B[ nj*(ti+ok) + gj ];        // B[k][j]
 	    barrier(CLK_LOCAL_MEM_FENCE);
+            #pragma unroll
 	    for (int k = 0; k < 16; ++k){
 	    	 Csub += As[ti][k] * Bs[k][tj];
 	    }
