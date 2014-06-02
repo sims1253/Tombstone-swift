@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     //types
     ocl::Program program(context, utl::type::Single | utl::type::Int);
     // inserts kernels into the program.
-    std::ifstream file("11.multi/multiLocal.cl");
+    std::ifstream file("12.multi/multiLocal.cl");
     program << file;
     // kernels are created and program is built for the context.
     program.build();
