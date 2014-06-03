@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     ocl::Kernel &kernel = program.kernel("GpuMatrixMul", utl::type::Single);
 
     // set the dimensions
-    size_t rows = 1<<12, cols = 1<<12, common = 1<<12;
+    size_t rows = 1<<13, cols = 1<<13, common = 1<<13;
 
     size_t elements_A = rows*common;
     //size_t elements_B = common*cols;
@@ -114,8 +114,8 @@ int main(int argc, char* argv[])
     
 
     //for(int f=0;f<10;f++){
-    // kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id());
-    kernel(queue, d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id(),int(common));
+    kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id());
+    //kernel(queue, d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id(),int(common));
 
      //d_matrix_E ist sonst B
     queue.finish();
