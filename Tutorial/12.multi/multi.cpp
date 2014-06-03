@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
 
     //for(int f=0;f<10;f++){
     kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id());
-    //kernel(queue, d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id(),int(common));
+    //kernel(queue, d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id(),int(common),int(cols));
 
      //d_matrix_E ist sonst B
     queue.finish();
@@ -130,6 +130,12 @@ int main(int argc, char* argv[])
 
 //    timer.tic();
     std::cout << "Time elapsed: " << Timer::elapsed() << std::endl;
+
+    if(h_matrix_A ==  h_matrix_C){
+        std::cout << "Computation was correct! old" << std::endl;
+    }else{
+        std::cout << "Computation was NOT correct! old" << std::endl;
+    }
   
 /*
     //std::cout << "Matrix(C) after computation : 
