@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     ocl::Kernel &kernel = program.kernel("GpuMatrixMul", utl::type::Single);
 
     // set the dimensions
-    size_t rows = 1<<13, cols = 1<<13, common = 1<<13;
+    size_t rows = 1<<12, cols = 1<<12, common = 1<<12;
 
     size_t elements_A = rows*common;
     //size_t elements_B = common*cols;
