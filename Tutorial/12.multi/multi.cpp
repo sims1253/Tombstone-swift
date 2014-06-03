@@ -114,8 +114,8 @@ int main(int argc, char* argv[])
     
 
     //for(int f=0;f<10;f++){
-    kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id());
-    //kernel(queue, d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id(),int(common),int(cols));
+    //kernel(queue, int(rows), int(cols), int(common), d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id());
+    kernel(queue, d_matrix_A.id(), d_matrix_E.id(), d_matrix_C.id(),int(common),int(cols));
 
      //d_matrix_E ist sonst B
     queue.finish();
