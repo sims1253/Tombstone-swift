@@ -51,12 +51,17 @@ __kernel void GpuMatrixMul( __global T* A, __global T* B,__global T* C, const in
 
     T Csub = 0.0f;
 
-     // T tmp[4];
-     // tmp[0]=0.0f;
-     // tmp[1]=0.0f;
-     // tmp[2]=0.0f;
-     // tmp[3]=0.0f;
-     // T sumPatch[2];
+     T tmp[2];
+     //T sumPatch[2];
+
+     tmp[0]=0.0f;
+     tmp[1]=0.0f;
+     /*
+     tmp[2]=0.0f;
+     tmp[3]=0.0f;
+     sumPatch[0]=0.0f;
+     sumPatch[1]=0.0f;
+     */
 
     // Loop over all the sub-matrices of A and B
     // required to compute the block sub-matrix
@@ -69,6 +74,15 @@ __kernel void GpuMatrixMul( __global T* A, __global T* B,__global T* C, const in
         As[ty][tx] = A[a + wA * ty + tx];
         Bs[ty][tx] = B[b + wB * ty + tx];
 
+        tmp[0]=0.0f;
+        tmp[1]=0.0f;
+        /*
+        tmp[2]=0.0f;
+        tmp[3]=0.0f;
+        sumPatch[0]=0.0f;
+        sumPatch[1]=0.0f;
+        */
+
 
         // Synchronize to make sure the matrices
         // are loaded
@@ -77,23 +91,20 @@ __kernel void GpuMatrixMul( __global T* A, __global T* B,__global T* C, const in
         // Multiply the two matrices together;
         // each thread computes one element
         // of the block sub-matrix
-        for (int k = 0; k < 16; ++k){
+        for (int k = 0; k < 8; ++k){
 
-            // tmp[0] += As[ty][k]    * Bs[k][tx];
-            // tmp[1] += As[ty][k+4]  * Bs[k+4][tx];
-            // tmp[2] += As[ty][k+8]  * Bs[k+8][tx];
-            // tmp[3] += As[ty][k+12] * Bs[k+12][tx];
+             tmp[0] += As[ty][k]    * Bs[k][tx];
 
-           Csub +=As[ty][k]    * Bs[k][tx];
+             tmp[1] += As[ty][k+8]  * Bs[k+8][tx];
+
+
+           //Csub +=As[ty][k]    * Bs[k][tx];
 
         }
 
-        // read_mem_fence(CLK_LOCAL_MEM_FENCE);
-        // sumPatch[0] = tmp[0]+tmp[1];
-        // sumPatch[1] = tmp[2]+tmp[3];
-        // read_mem_fence(CLK_LOCAL_MEM_FENCE);
-        // Csub = Csub + sumPatch[0];
-        // Csub = Csub + sumPatch[1];
+
+         Csub = tmp[1] + tmp[0];
+
 
         // Synchronize to make sure that the preceding
         // computation is done before loading two new
