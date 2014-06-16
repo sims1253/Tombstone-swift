@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 
     using Timer = utl::Timer<utl::MilliSeconds>;
 
-    kernel.setWorkSize(16,16, rows, cols);
+    kernel.setWorkSize(32,2, rows, cols/16);
     //kernel.setGlobalSize(global_mem,1);
     //kernel.setLocalSize(16,2);
 
