@@ -1,6 +1,3 @@
-#include <iostream>
-#include <algorithm>
-
 #include <ocl_wrapper.h>
 #include <utl_utils.h>
 #ifdef __APPLE__
@@ -17,7 +14,7 @@ typedef utl::Ones <Type,utl::row_major_tag> Ones;
 typedef utl::Zeros <Type,utl::row_major_tag> Zeros;
 typedef utl::Rand <Type,utl::row_major_tag, utl::uniform_dist_tag> Rand;
 
-int main(int argc, char* argv[])
+int blub(int argc, char* argv[])
 {
 
     // provides a convient access to the command line arguments

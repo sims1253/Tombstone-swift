@@ -41,7 +41,7 @@ image: 10.image/image.cpp
 profile: 11.profile/profile.cpp 11.profile/profile.h
 	$(MAKE) -C 11.profile   LIBS=$(LIBS) INCS=$(INCS) GCC_FLAGS=$(GCC_FLAGS)
 
-multi: 12.multi/multi.cpp
+multi: 12.multi/profile.cpp 12.multi/profile.h
 	$(MAKE) -C 12.multi   LIBS=$(LIBS) INCS=$(INCS) GCC_FLAGS=$(GCC_FLAGS)
 
 .PHONY : clean
