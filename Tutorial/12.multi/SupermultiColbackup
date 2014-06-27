@@ -1,0 +1,106 @@
+/*
+ * Matrix multiplication: C = A * B.
+ * Device code.
+ */
+ 
+// Thread block size
+//#define BLOCK_SIZE 16
+  
+//////////////////////////////////////////////////////
+//! Matrix multiplication on the device: C = A * B
+//! wA is A's width and wB is B's width
+//////////////////////////////////////////////////////
+template<class T>
+__kernel void GpuMatrixMulCM( __global T* C, __global T* A,__global T* B, const int wA, const int wB, const int hA, const int hB)
+{
+    // Block index
+    int bx = get_group_id(0);
+    int by = get_group_id(1);
+ 
+    // Thread index
+    int tx = get_local_id(0);
+    int ty = get_local_id(1);
+ 
+    // Index of the first sub-matrix of A processed 
+    // by the block
+    int aBegin = hA * 32 * bx;
+ 
+    // Index of the last sub-matrix of A processed 
+    // by the block
+    int aEnd   = aBegin + hA - 1;
+ 
+    // Step size used to iterate through the 
+    // sub-matrices of A
+    int aStep  = 32 * hA;
+ 
+    // Index of the first sub-matrix of B processed 
+    // by the block
+    int bBegin = 32 * hB * bx;
+ 
+    // Step size used to iterate through the 
+    // sub-matrices of B
+    int bStep  = 32;
+
+    // Declaration of the local memory array As 
+    // used to store the sub-matrix of A
+    
+ 
+    // Declaration of the local memory array Bs 
+    // used to store the sub-matrix of B
+    
+
+    T Csub [16]= {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+
+
+ 
+    // Loop over all the sub-matrices of A and B
+    // required to compute the block sub-matrix
+    for (int a = aBegin, b = bBegin; a <= aEnd; a += aStep, b += bStep) 
+    {
+
+      __local T Bs[32][32];
+      __local T As[32][32];
+        // Load the matrices from global memory
+        // to local memory; each thread loads
+        // one element of each matrix
+        As[ty][tx] = A[a + tx * hA + ty];
+        Bs[ty][tx] = B[b + tx * hB + ty];
+        As[ty+2][tx] = A[a + tx+2 * hA + ty];
+        Bs[ty+2][tx] = B[b + tx+2 * hB + ty];
+        As[ty+4][tx] = A[a + tx+4 * hA + ty];
+        Bs[ty+4][tx] = B[b + tx+4 * hB + ty];
+        As[ty+6][tx] = A[a + tx+6 * hA + ty];
+        Bs[ty+6][tx] = B[b + tx+6 * hB + ty];
+        As[ty+8][tx] = A[a + tx+7 * hA + ty];
+        Bs[ty+8][tx] = B[b + tx+7 * hB + ty];
+        As[ty+10][tx] = A[a + tx+8 * hA + ty];
+        Bs[ty+10][tx] = B[b + tx+8 * hB + ty];
+ 
+        // Synchronize to make sure the matrices 
+        // are loaded
+        barrier(CLK_LOCAL_MEM_FENCE);
+ 
+        // Multiply the two matrices together;
+        // each thread computes one element
+        // of the block sub-matrix
+        for (int k = 0; k < 32; ++k){
+            Csub += As[ty][k]    * Bs[k][tx];
+
+            
+        }
+
+ 
+        // Synchronize to make sure that the preceding
+        // computation is done before loading two new
+        // sub-matrices of A and B in the next iteration
+        barrier(CLK_LOCAL_MEM_FENCE);
+ 
+    }
+ 
+    // Write the block sub-matrix to device memory;
+    // each thread writes one element
+    int c = 32 * by + 32 * bx * hB;
+    C[c + ty + tx * hA] = Csub;
+   
+
+}

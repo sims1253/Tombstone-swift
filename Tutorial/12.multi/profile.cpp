@@ -31,9 +31,9 @@ int main( int argc, char** argv )
 	const utl::Dim last  = utl::Dim(l,l,l);
 	const utl::Dim step  = utl::Dim(s,s,s);
 
-	mgr << new StudXPass1<float,utl::row_major_tag,256u,1u>    ("12.multi/supermulti.cl","GpuMatrixMul", first, step, 
+	mgr << new Stud4Pass1<float,utl::row_major_tag,32u,2u>    ("12.multi/supermulti.cl","GpuMatrixMulRM", first, step, 
 		last, testing, 10);
-	mgr << new StudXPass1<float,utl::column_major_tag,256u,1u> ("12.multi/supermulti.cl","GpuMatrixMul", first, step, 
+	mgr << new Stud4Pass1<float,utl::column_major_tag,32u,2u> ("12.multi/supermulti.cl","GpuMatrixMulCM", first, step, 
 		last, testing, 10);
 
     mgr.run();
