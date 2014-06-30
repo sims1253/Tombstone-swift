@@ -136,8 +136,10 @@ utl::Seconds Stud4Pass1<Type_,Format_, W1,W2>::prof( utl::Dim const& dim )
 	  if ( ! kernel_->created() ) { throw std::runtime_error( "kernel not created" ); }
 
 
-
-	  kernel_->setWorkSize( W1, W2, M, N/16);;	  
+	  if(std::is_same<Format_, utl::column_major_tag>::value)
+	  	kernel_->setWorkSize( W1, W2, M, N);
+	  else
+	  	kernel_->setWorkSize( W1, W2, M, N/16);
 
 
 	  const size_t numResBytes = sizeof (Type) * M * N;
