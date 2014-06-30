@@ -50,7 +50,8 @@ __kernel void GpuMatrixMulCM( __global T* C, __global T* A,__global T* B, const 
     // Declaration of the local memory array Bs 
     // used to store the sub-matrix of B
     
-
+      __local T Bs[32][32];
+      __local T As[32][32];
     T Csub [16]= {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
 
@@ -62,58 +63,57 @@ __kernel void GpuMatrixMulCM( __global T* C, __global T* A,__global T* B, const 
 
         // Keep the local matrices the same as in rowmajor multiplication,
         // just aquire the and store the data in column major format
-      __local T Bs[32][32];
-      __local T As[32][32];
+
         // Load the matrices from global memory
         // to local memory; each thread loads
         // one element of each matrix
-        As[ty][tx] = A[a + tx * hA + ty];
-        Bs[ty][tx] = B[b + tx * hB + ty];
+        As[ty][tx] = A[a + ty + hA * tx];
+        Bs[ty][tx] = B[b + ty + hA * tx];
 
-        As[ty+2][tx] = A[a + (tx) * hA + ty+2];
-        Bs[ty+2][tx] = B[b + (tx) * hB + ty+2];
+        As[ty+2][tx] = A[a + ty+2 + hA * tx];
+        Bs[ty+2][tx] = B[b + ty+2 + hA * tx];
 
-        As[ty+4][tx] = A[a + (tx) * hA + ty+4];
-        Bs[ty+4][tx] = B[b + (tx) * hB + ty+4];
+        As[ty+4][tx] = A[a + ty+4 + hA * tx];
+        Bs[ty+4][tx] = B[b + ty+4 + hA * tx];
 
-        As[ty+6][tx] = A[a + (tx) * hA + ty+6];
-        Bs[ty+6][tx] = B[b + (tx) * hB + ty+6];
+        As[ty+6][tx] = A[a + ty+6 + hA * tx];
+        Bs[ty+6][tx] = B[b + ty+6 + hA * tx];
 
-        As[ty+8][tx] = A[a + (tx) * hA + ty+8];
-        Bs[ty+8][tx] = B[b + (tx) * hB + ty+8];
+        As[ty+8][tx] = A[a + ty+8 + hA * tx];
+        Bs[ty+8][tx] = B[b + ty+8 + hA * tx];
 
-        As[ty+10][tx] = A[a + (tx) * hA + ty+10];
-        Bs[ty+10][tx] = B[b + (tx) * hB + ty+10];
+        As[ty+10][tx] = A[a + ty+10 + hA * tx];
+        Bs[ty+10][tx] = B[b + ty+10 + hA * tx];
 
-        As[ty+12][tx] = A[a + (tx) * hA + ty+12];
-        Bs[ty+12][tx] = B[b + (tx) * hB + ty+12];
+        As[ty+12][tx] = A[a + ty+12 + hA * tx];
+        Bs[ty+12][tx] = B[b + ty+12 + hA * tx];
 
-        As[ty+14][tx] = A[a + (tx) * hA + ty+14];
-        Bs[ty+14][tx] = B[b + (tx) * hB + ty+14];
+        As[ty+14][tx] = A[a + ty+14 + hA * tx];
+        Bs[ty+14][tx] = B[b + ty+14 + hA * tx];
 
-        As[ty+16][tx] = A[a + (tx) * hA + ty+16];
-        Bs[ty+16][tx] = B[b + (tx) * hB + ty+16];
+        As[ty+16][tx] = A[a + ty+16 + hA * tx];
+        Bs[ty+16][tx] = B[b + ty+16 + hA * tx];
 
-        As[ty+18][tx] = A[a + (tx) * hA + ty+18];
-        Bs[ty+18][tx] = B[b + (tx) * hB + ty+18];
+        As[ty+18][tx] = A[a + ty+18 + hA * tx];
+        Bs[ty+18][tx] = B[b + ty+18 + hA * tx];
 
-        As[ty+20][tx] = A[a + (tx) * hA + ty+20];
-        Bs[ty+20][tx] = B[b + (tx) * hB + ty+20];
+        As[ty+20][tx] = A[a + ty+20 + hA * tx];
+        Bs[ty+20][tx] = B[b + ty+20 + hA * tx];
 
-        As[ty+22][tx] = A[a + (tx) * hA + ty+22];
-        Bs[ty+22][tx] = B[b + (tx) * hB + ty+22];
+        As[ty+22][tx] = A[a + ty+22 + hA * tx];
+        Bs[ty+22][tx] = B[b + ty+22 + hA * tx];
 
-        As[ty+24][tx] = A[a + (tx) * hA + ty+24];
-        Bs[ty+24][tx] = B[b + (tx) * hB + ty+24];
+        As[ty+24][tx] = A[a + ty+24 + hA * tx];
+        Bs[ty+24][tx] = B[b + ty+24 + hA * tx];
 
-        As[ty+26][tx] = A[a + (tx) * hA + ty+26];
-        Bs[ty+26][tx] = B[b + (tx) * hB + ty+26];
+        As[ty+26][tx] = A[a + ty+26 + hA * tx];
+        Bs[ty+26][tx] = B[b + ty+26 + hA * tx];
 
-        As[ty+28][tx] = A[a + (tx) * hA + ty+28];
-        Bs[ty+28][tx] = B[b + (tx) * hB + ty+28];
+        As[ty+28][tx] = A[a + ty+28 + hA * tx];
+        Bs[ty+28][tx] = B[b + ty+28 + hA * tx];
 
-        As[ty+30][tx] = A[a + (tx) * hA + ty+30];
-        Bs[ty+30][tx] = B[b + (tx) * hB + ty+30];
+        As[ty+30][tx] = A[a + ty+30 + hA * tx];
+        Bs[ty+30][tx] = B[b + ty+30 + hA * tx];
 
 
 
@@ -141,9 +141,7 @@ __kernel void GpuMatrixMulCM( __global T* C, __global T* A,__global T* B, const 
             Csub[12] +=As[ty+24][k]    * Bs[k][tx];
             Csub[13] +=As[ty+26][k]    * Bs[k][tx];
             Csub[14] +=As[ty+28][k]    * Bs[k][tx];
-            Csub[15] +=As[ty+30][k]    * Bs[k][tx];
-
-            
+            Csub[15] +=As[ty+30][k]    * Bs[k][tx];            
         }
 
  
@@ -156,24 +154,25 @@ __kernel void GpuMatrixMulCM( __global T* C, __global T* A,__global T* B, const 
  
     // Write the block sub-matrix to device memory;
     // each thread writes one element
-    int c = 32*( hA * bx + by);   
+    int c = 32*( by + hA * bx);   
 
-    C[c + hA * tx + ty] = Csub[0];
-    C[c + hA * (tx+2) + ty] = Csub[1];
-    C[c + hA * (tx+4) + ty] = Csub[2];
-    C[c + hA * (tx+6) + ty] = Csub[3];
-    C[c + hA * (tx+8) + ty] = Csub[4];
-    C[c + hA * (tx+10) + ty] = Csub[5];
-    C[c + hA * (tx+12) + ty] = Csub[6];
-    C[c + hA * (tx+14) + ty] = Csub[7];
-    C[c + hA * (tx+16) + ty] = Csub[8];
-    C[c + hA * (tx+18) + ty] = Csub[9];
-    C[c + hA * (tx+20) + ty] = Csub[10];
-    C[c + hA * (tx+22) + ty] = Csub[11];
-    C[c + hA * (tx+24) + ty] = Csub[12];
-    C[c + hA * (tx+26) + ty] = Csub[13];
-    C[c + hA * (tx+28) + ty] = Csub[14];
-    C[c + hA * (tx+30) + ty] = Csub[15];
+
+    C[c + wB * ty + tx] = Csub[0];
+    C[c + wB * (ty+2) + tx] = Csub[1];
+    C[c + wB * (ty+4) + tx] = Csub[2];
+    C[c + wB * (ty+6) + tx] = Csub[3];
+    C[c + wB * (ty+8) + tx] = Csub[4];
+    C[c + wB * (ty+10) + tx] = Csub[5];
+    C[c + wB * (ty+12) + tx] = Csub[6];
+    C[c + wB * (ty+14) + tx] = Csub[7];
+    C[c + wB * (ty+16) + tx] = Csub[8];
+    C[c + wB * (ty+18) + tx] = Csub[9];
+    C[c + wB * (ty+20) + tx] = Csub[10];
+    C[c + wB * (ty+22) + tx] = Csub[11];
+    C[c + wB * (ty+24) + tx] = Csub[12];
+    C[c + wB * (ty+26) + tx] = Csub[13];
+    C[c + wB * (ty+28) + tx] = Csub[14];
+    C[c + wB * (ty+30) + tx] = Csub[15];
     Csub[0] = 0.0f;
     Csub[1] = 0.0f;
     Csub[2] = 0.0f;
@@ -261,13 +260,12 @@ __kernel void GpuMatrixMulRM( __global T* C, __global T* A,__global T* B, const 
      sumPatch[0]=0.0f;
      sumPatch[1]=0.0f;
      */
-
+    __local T As[32][32];
+    __local T Bs[32][32];
     // Loop over all the sub-matrices of A and B
     // required to compute the block sub-matrix
     for (int a = aBegin, b = bBegin; a <= aEnd; a += aStep, b += bStep)
     {
-        __local T As[32][32];
-        __local T Bs[32][32];
 
         // Load the matrices from global memory
         // to local memory; each thread loads

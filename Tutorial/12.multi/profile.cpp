@@ -33,7 +33,7 @@ int main( int argc, char** argv )
 
 	mgr << new Stud4Pass1<float,utl::row_major_tag,32u,2u>    ("12.multi/supermulti.cl","GpuMatrixMulRM", first, step, 
 		last, testing, 10);
-	mgr << new Stud4Pass1<float,utl::column_major_tag,32u,2u> ("12.multi/supermulti.cl","GpuMatrixMulCM", first, step, 
+	mgr << new Stud4Pass1<float,utl::column_major_tag,16u,16u> ("12.multi/SuperRoll.cl","GpuMatrixMulCM", first, step, 
 		last, testing, 10);
 
     mgr.run();
