@@ -137,14 +137,16 @@ utl::Seconds Stud4Pass1<Type_,Format_, W1,W2>::prof( utl::Dim const& dim )
 
 
 	  if(std::is_same<Format_, utl::column_major_tag>::value)
-	  	kernel_->setWorkSize( W1, W2, M, N);
+	  	kernel_->setWorkSize( W1, W2, M, N/16);
 	  else
 	  	kernel_->setWorkSize( W1, W2, M, N/16);
 
 
 	  const size_t numResBytes = sizeof (Type) * M * N;
 	  const size_t numLhsBytes = sizeof (Type) * K * N;
-	  const size_t numRhsBytes = sizeof (Type) * N * M;
+	  const size_t numRhsBytes = sizeof (Type) * K * M;
+
+	  //TODO ist B k * M oder N * M ???!!!???
 
 	  ocl::Buffer bufRes( context_, numResBytes, ocl::Buffer::WriteOnly );
 	  ocl::Buffer bufLhs( context_, numLhsBytes, ocl::Buffer::ReadOnly );
@@ -176,8 +178,8 @@ utl::Seconds Stud4Pass1<Type_,Format_, W1,W2>::prof( utl::Dim const& dim )
 	  	std::ref(bufRes), std::cref(bufLhs), std::cref(bufRhs), std::cref(K), std::cref(M), std::cref(N)));
 
 
-	  std::cout << "Zeit: "<< t << std::endl;
-	  std::cout << "Flops: " << std::chrono::duration<double, std::ratio<1l> >(ops(dim))/t << std::endl;
+	  //std::cout << "Zeit: "<< t << std::endl;
+	  //std::cout << "Flops: " << std::chrono::duration<double, std::ratio<1l> >(ops(dim))/t << std::endl;
 
 
 	  if( testing_ )
