@@ -33,7 +33,7 @@ __kernel void GpuMatrixMulCM( __global T* C, __global T* A,__global T* B, const 
  
     // Index of the first sub-matrix of B processed 
     // by the block
-    int bBegin = 32* hB * bx;
+    int bBegin = 32 * bx;
  
     // Step size used to iterate through the 
     // sub-matrices of B
