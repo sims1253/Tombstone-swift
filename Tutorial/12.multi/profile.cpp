@@ -39,9 +39,9 @@ int main( int argc, char** argv )
 	//	last, testing, 10);
 	//	mgr << new Stud4Pass1<float,utl::column_major_tag,32u,2u> ("12.multi/kernels.cl","CMunrolled", first, step, 
 	//	last, testing, 10);
-	mgr << new Stud4Pass1<float,utl::row_major_tag,32u,32u>    ("12.multi/simpleMulti.cl",
+	mgr << new Stud4Pass1<float,utl::row_major_tag,16u,16u>    ("12.multi/simpleMulti.cl",
 		"multi", first, step, last, testing, 10);
-	mgr << new Stud4Pass1<float,utl::column_major_tag,32u,32u>    ("12.multi/simpleMulti.cl",
+	mgr << new Stud4Pass1<float,utl::column_major_tag,16u,16u>    ("12.multi/simpleMulti.cl",
 		"multi", first, step, last, testing, 10);
 
     mgr.run();
