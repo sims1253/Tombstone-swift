@@ -2,7 +2,6 @@ template<class T>
 __kernel void multi( __global T* C, __global T* A,__global T* B, const int rowDim, 
 	const int colDim, const int productDim)
 {
-{
 	int i,j,k;
 
 	i=get_global_id(0);
