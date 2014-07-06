@@ -1,6 +1,6 @@
 // Matrix multiplication, column major format
 template<class T>
-__kernel void GpuMatrixMulCM( __global T* C, __global T* A,__global T* B, const int wA, const int wB, const int hA)
+__kernel void CMunrolled( __global T* C, __global T* A,__global T* B, const int wA, const int wB, const int hA)
 {
     const int hB = wA;
     // Block index
@@ -115,22 +115,23 @@ __kernel void GpuMatrixMulCM( __global T* C, __global T* A,__global T* B, const 
         // each thread computes one element
         // of the block sub-matrix
         for (int k = 0; k < 32; ++k){
-            Csub[0] +=As[ty][k]    * Bs[k][tx];
-            Csub[1] +=As[ty+2][k]    * Bs[k][tx];
-            Csub[2] +=As[ty+4][k]    * Bs[k][tx];
-            Csub[3] +=As[ty+6][k]    * Bs[k][tx];
-            Csub[4] +=As[ty+8][k]    * Bs[k][tx];
-            Csub[5] +=As[ty+10][k]    * Bs[k][tx];
-            Csub[6] +=As[ty+12][k]    * Bs[k][tx];
-            Csub[7] +=As[ty+14][k]    * Bs[k][tx];
-            Csub[8] +=As[ty+16][k]    * Bs[k][tx];
-            Csub[9] +=As[ty+18][k]    * Bs[k][tx];
-            Csub[10] +=As[ty+20][k]    * Bs[k][tx];
-            Csub[11] +=As[ty+22][k]    * Bs[k][tx];
-            Csub[12] +=As[ty+24][k]    * Bs[k][tx];
-            Csub[13] +=As[ty+26][k]    * Bs[k][tx];
-            Csub[14] +=As[ty+28][k]    * Bs[k][tx];
-            Csub[15] +=As[ty+30][k]    * Bs[k][tx];
+            T Btemp = Bs[k][tx];
+            Csub[0] +=As[ty][k]    * Btemp;
+            Csub[1] +=As[ty+2][k]    * Btemp;
+            Csub[2] +=As[ty+4][k]    * Btemp;
+            Csub[3] +=As[ty+6][k]    * Btemp;
+            Csub[4] +=As[ty+8][k]    * Btemp;
+            Csub[5] +=As[ty+10][k]    * Btemp;
+            Csub[6] +=As[ty+12][k]    * Btemp;
+            Csub[7] +=As[ty+14][k]    * Btemp;
+            Csub[8] +=As[ty+16][k]    * Btemp;
+            Csub[9] +=As[ty+18][k]    * Btemp;
+            Csub[10] +=As[ty+20][k]    * Btemp;
+            Csub[11] +=As[ty+22][k]    * Btemp;
+            Csub[12] +=As[ty+24][k]    * Btemp;
+            Csub[13] +=As[ty+26][k]    * Btemp;
+            Csub[14] +=As[ty+28][k]    * Btemp;
+            Csub[15] +=As[ty+30][k]    * Btemp;
        
         }
 
@@ -162,20 +163,4 @@ __kernel void GpuMatrixMulCM( __global T* C, __global T* A,__global T* B, const 
     C[c + ty + 26 + (tx * hA)] = Csub[13];
     C[c + ty + 28 + (tx * hA)] = Csub[14];
     C[c + ty + 30 + (tx * hA)] = Csub[15];
-    Csub[0] = 0.0f;
-    Csub[1] = 0.0f;
-    Csub[2] = 0.0f;
-    Csub[3] = 0.0f;
-    Csub[4] = 0.0f;
-    Csub[5] = 0.0f;
-    Csub[6] = 0.0f;
-    Csub[7] = 0.0f;
-    Csub[8] = 0.0f;
-    Csub[9] = 0.0f;
-    Csub[10] = 0.0f;
-    Csub[11] = 0.0f;
-    Csub[12] = 0.0f;
-    Csub[13] = 0.0f;
-    Csub[14] = 0.0f;
-    Csub[15] = 0.0f;
 }
