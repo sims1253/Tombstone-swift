@@ -37,7 +37,7 @@ int main( int argc, char** argv )
 		last, testing, 10);
 	//mgr << new Stud4Pass1<float,utl::row_major_tag,32u,2u>    ("12.multi/kernels.cl","RMunrolledBsregister", first, step, 
 	//	last, testing, 10);
-		mgr << new Stud4Pass1<float,utl::column_major_tag,32u,2u> ("12.multi/CMUBlockUnrolled.cl","CMunrolled", first, step, 
+	mgr << new Stud4Pass1<float,utl::column_major_tag,32u,2u> ("12.multi/CMBlockUnrolled.cl","CMunrolled", first, step, 
 		last, testing, 10);
 	//mgr << new Stud4Pass1<float,utl::row_major_tag,16u,16u>    ("12.multi/simpleMulti.cl",
 	//	"multi", first, step, last, testing, 10);
