@@ -21,6 +21,7 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
+#include <memory>
 
 #include <ocl_query.h>
 #include <ocl_program.h>
@@ -220,7 +221,6 @@ void ocl::Program::setTypes(const utl::Types& types)
     TRUE_ASSERT(!types.empty(), "Types should not be empty");
     TRUE_ASSERT(!this->isBuilt(), "Program already built.");
     _types = types;
-
 }
 
 /*! \brief Sets the Types for the Kernel objects.
@@ -358,17 +358,18 @@ ocl::Program& ocl::Program::operator << (const std::string &k)
         if(_types.empty() || !ocl::Kernel::templated(next)){
             ocl::Kernel *kernel = new ocl::Kernel(*this, next);
             if(this->isBuilt()) kernel->create();
-            //DEBUG_COMMENT("Creating kernel " << kernel->name() << std::endl << kernel->toString() );
+//			DEBUG_COMMENT("Creating kernel " << kernel->name() << std::endl << kernel->toString() );
             _kernels[kernel->name()] = kernel;
             continue;
         }
+
 
         for(utl::Types::const_iterator it = _types.begin(); it != _types.end(); ++it)
         {
             const utl::Type &type = **it;
             ocl::Kernel *kernel = new ocl::Kernel(*this, next, type);
             if(this->isBuilt()) kernel->create();
-            //DEBUG_COMMENT("Creating kernel " << kernel->name() << std::endl << kernel->toString() );
+//			DEBUG_COMMENT("Creating kernel template" << kernel->name() << std::endl << kernel->toString() );
             _kernels[kernel->name()] = kernel;
         }
     }
@@ -468,8 +469,6 @@ std::string ocl::Program::nextKernel(const std::string &kernels, size_t pos)
 {
     if(pos == kernels.npos) return "";
 
-
-
     size_t start_template = kernels.find("template", pos);
     size_t start_non_template = kernels.find("__kernel",pos);
     size_t start;
@@ -517,26 +516,24 @@ std::string ocl::Program::nextKernel(const std::string &kernels, size_t pos)
 void ocl::Program::eraseComments(std::string &kernels) const
 {
 	size_t end_pos = 0, pos = 0;
-    while(pos < kernels.length()){
-            pos = kernels.find("/*", pos,2);
-            end_pos = kernels.find("*/", pos,2);
-            if(pos >= kernels.length()) break;
-            if(end_pos >= kernels.length()) break;
-            TRUE_ASSERT(pos < end_pos, pos << " >= " << end_pos);
-//		cout << "Erasing substring : " << kernels.substr(start_pos, end_pos-start_pos+2) <<  "-ENDEND" << endl;
-            kernels.erase(pos, end_pos-pos+2);
-            pos += 2;
+	while(pos < kernels.length()){
+		pos = kernels.find("/*", pos,2);
+		end_pos = kernels.find("*/", pos,2);
+		if(pos >= kernels.length()) break;
+		if(end_pos >= kernels.length()) break;
+		TRUE_ASSERT(pos < end_pos, pos << " >= " << end_pos);
+		kernels.erase(pos, end_pos-pos+2);
+		pos += 2;
 	}
-        pos = 0;
-        while(pos < kernels.length()){
-            pos = kernels.find("//", pos,2);
-            end_pos = kernels.find("\n", pos); std::string s("\n");
-            if(pos >= kernels.length()) break;
-            if(end_pos >= kernels.length()) break;
-            TRUE_ASSERT(pos < end_pos, pos << " >= " << end_pos);
-            //		cout << "Erasing substring : " << kernels.substr(start_pos, end_pos-start_pos) <<  "-ENDEND" << endl;
-            kernels.erase(pos, end_pos-pos);
-            pos++;
+	pos = 0;
+	while(pos < kernels.length()){
+		pos = kernels.find("//", pos,2);
+		end_pos = kernels.find("\n", pos); std::string s("\n");
+		if(pos >= kernels.length()) break;
+		if(end_pos >= kernels.length()) break;
+		TRUE_ASSERT(pos < end_pos, pos << " >= " << end_pos);
+		kernels.erase(pos, end_pos-pos);
+		pos++;
 	}
 }
 
@@ -547,19 +544,19 @@ void ocl::Program::eraseComments(std::string &kernels) const
 void ocl::Program::checkBuild(cl_int buildErr) const
 {
 	if(buildErr == CL_SUCCESS) return;
-    std::cerr << "Program failed to build." << std::endl;
+	std::cerr << "Program failed to build." << std::endl;
 	cl_build_status buildStatus;
-    std::string buildLog;
+	std::string buildLog;
 	size_t size = 0;
-    for(auto device : _context->devices()){
-        clGetProgramBuildInfo(_id, device.id(), CL_PROGRAM_BUILD_STATUS, sizeof(cl_build_status), &buildStatus, NULL);
+	for(auto device : _context->devices()){
+		clGetProgramBuildInfo(_id, device.id(), CL_PROGRAM_BUILD_STATUS, sizeof(cl_build_status), &buildStatus, NULL);
 		if(buildStatus == CL_SUCCESS) continue;
 
-		clGetProgramBuildInfo(_id, device.id(), CL_PROGRAM_BUILD_LOG,  0, NULL, &size);
-		buildLog.assign((unsigned int)size, 0);
+		clGetProgramBuildInfo(_id, device.id(), CL_PROGRAM_BUILD_LOG, 0, NULL, &size);
 
-		clGetProgramBuildInfo(_id, device.id(), CL_PROGRAM_BUILD_LOG,  size, &buildLog[0], NULL);
-        std::cerr << "Device " << device.name() << " Build Log:" << std::endl << buildLog << std::endl;
+		std::unique_ptr< cl_char[] > buildLog( new cl_char[size] );
+		clGetProgramBuildInfo(_id, device.id(), CL_PROGRAM_BUILD_LOG, size, buildLog.get(), NULL);
+		std::cerr << "Device " << device.name() << " Build Log:" << std::endl << buildLog.get() << std::endl;
 	}
 	exit(-1);
 }

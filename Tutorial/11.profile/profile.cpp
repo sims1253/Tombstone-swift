@@ -17,8 +17,7 @@ int main( int argc, char** argv )
 
     size_t const numArgs = args.size();
 
-	if ( numArgs != 4 && numArgs != 5) {std::cerr << "Usage: " << args.at( 0 ) << " dimStart dimEnd dimStep <testing>" << std::endl; 
-	return EXIT_FAILURE;}
+	if ( numArgs != 4 && numArgs != 5) {std::cerr << "Usage: " << args.at( 0 ) << " dimStart dimEnd dimStep <testing>" << std::endl; return EXIT_FAILURE;}
 
 	utl::ProfilePassManager mgr;
 
@@ -31,10 +30,8 @@ int main( int argc, char** argv )
 	const utl::Dim last  = utl::Dim(l,l,l);
 	const utl::Dim step  = utl::Dim(s,s,s);
 
-	mgr << new StudXPass1<float,utl::row_major_tag,256u,1u>    ("11.profile/profile1.cl","matvec1_rmajor", first, step, 
-		last, testing, 10);
-	mgr << new StudXPass1<float,utl::column_major_tag,256u,1u> ("11.profile/profile1.cl","matvec1_cmajor", first, step, 
-		last, testing, 10);
+	mgr << new StudXPass1<float,utl::row_major_tag,256u,1u>    ("11.profile/profile1.cl","matvec1_rmajor", first, step, last, testing, 10);
+	mgr << new StudXPass1<float,utl::column_major_tag,256u,1u> ("11.profile/profile1.cl","matvec1_cmajor", first, step, last, testing, 10);
 
     mgr.run();
     mgr.write( std::cout );

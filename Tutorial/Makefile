@@ -6,7 +6,7 @@ LIBS:="$(OCL_WRAPPER_LIB) $(OCL_LIB) $(OGL_LIB)"
 
 GCC_FLAGS:="-std=c++11 -Wall -O3"
 
-all: platform context queue program buffer kernel events matrix minimum image profile multi
+all: platform context queue program buffer kernel events matrix minimum image profile
 
 platform: 1.platform/platform.cpp
 	$(MAKE) -C 1.platform LIBS=$(LIBS) INCS=$(INCS) GCC_FLAGS=$(GCC_FLAGS)
@@ -41,9 +41,6 @@ image: 10.image/image.cpp
 profile: 11.profile/profile.cpp 11.profile/profile.h
 	$(MAKE) -C 11.profile   LIBS=$(LIBS) INCS=$(INCS) GCC_FLAGS=$(GCC_FLAGS)
 
-multi: 12.multi/profile.cpp 12.multi/profile.h
-	$(MAKE) -C 12.multi   LIBS=$(LIBS) INCS=$(INCS) GCC_FLAGS=$(GCC_FLAGS)
-
 .PHONY : clean
 
 clean :
@@ -58,5 +55,4 @@ clean :
 	$(MAKE) clean -C 9.minimum
 	$(MAKE) clean -C 10.image
 	$(MAKE) clean -C 11.profile
-	$(MAKE) clean -C 12.multi
 
