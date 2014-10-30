@@ -4,15 +4,15 @@ project(OpenCL-Wrapper)
 
 find_library(OPENCL_LIBRARIES OpenCL)
 find_path(OPENCL_INCLUDE_DIR CL/cl.h HINTS 
-  /usr/include 
-  /opt/AMDAPP/include 
-  /usr/local/cuda/include
-  )
+	/usr/include 
+	/opt/AMDAPP/include 
+	/usr/local/cuda/include
+	)
 
 include_directories(SYSTEM ${OPENCL_INCLUDE_DIR})
 include_directories(Code/inc)
 
-add_definitions(-std=c++11 -Wall -Wextra -pedantic -pedantic-errors)
+add_definitions(-std=c++11 -Wall -Wextra -Werror -Weffc++ -pedantic -pedantic-errors)
 
 set(OclWrapper_HDRS
   Code/inc/ocl_buffer.h
@@ -98,6 +98,3 @@ target_link_libraries(minimum OclWrapper ${OPENCL_LIBRARIES})
 
 add_executable(image Tutorial/10.image/image.cpp)
 target_link_libraries(image OclWrapper ${OPENCL_LIBRARIES})
-
-add_executable(multi Tutorial/11.multi/multi.cpp)
-target_link_libraries(multi OclWrapper ${OPENCL_LIBRARIES})
