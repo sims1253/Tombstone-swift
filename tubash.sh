@@ -13,19 +13,21 @@ echo "Directory doesn't exist and will be created..."
 mkdir ${MP}
 fi
 
-echo "Do you want to use NVIDIA (n) or ATI (a) GPU? (n/a)"
+echo "Do you want to use NVIDIA (n), ATI (a) or Intel (i) GPU? (n/a/i)"
 read answer
 if [ "$answer" == "n" ]; then
 GPU=xy5.ti6.tu-harburg.de
 elif [ "$answer" == "a" ]; then
 GPU=xy3.ti6.tu-harburg.de
+elif [ "$answer" == "i" ]; then
+GPU=xy4.ti6.tu-harburg.de
 else
-echo "Please type n or a!"
+echo "Please type n, a or i!"
 exit
 fi
 
 PORT=2126
-GPU_USER=stud4 # X steht für die Gruppennumer
+GPU_USER=ti6nms # X steht für die Gruppennumer
 
 echo "Attempting ssh port forwarding stuff..."
 echo "ssh -N -f -L ${PORT}:${GPU}:22 ${USER}@ssh.rz.tu-harburg.de"
