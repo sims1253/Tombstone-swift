@@ -178,7 +178,18 @@ utl::Seconds Stud4Pass1<Type_,Format_, W1,W2>::prof( utl::Dim const& dim )
 	  auto t = this->call(std::bind(lambda, std::ref(*kernel_), std::ref(queue_), 
 	  	std::ref(bufRes), std::cref(bufLhs), std::cref(bufRhs), std::cref(K), std::cref(M), std::cref(N)));
 
+	  /** For larger testing
+	  size_t iter = 100;
 
+	  for(size_t forIter = iter; forIter > 1; forIter--)
+	  {
+	  	t += this->call(std::bind(lambda, std::ref(*kernel_), std::ref(queue_), 
+	  	std::ref(bufRes), std::cref(bufLhs), std::cref(bufRhs), std::cref(K), std::cref(M), std::cref(N)));	
+	  }
+
+	  t= t/iter;
+
+	  */
 	  //std::cout << "Zeit: "<< t << std::endl;
 	  //std::cout << "Flops: " << std::chrono::duration<double, std::ratio<1l> >(ops(dim))/t << std::endl;
 
