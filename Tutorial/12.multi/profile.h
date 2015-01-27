@@ -46,13 +46,16 @@ public :
 			   const Dim& step,               /*! Step dimension e.g. Dim(32,32,32) such that this pass iterates from first to last dimension */
 			   const Dim& end,                /*! Last dimension e.g. Dim(256,256,256) with Dim[0]=M, Dim[1]=N, Dim[2]=K, */
 			   bool testing = false,          /*! If true, compares the cpu reference result to the gpu result */
-			   size_t iter = 10);             /*! Number of kernel iterations */
+			   size_t iter = 100000);             /*! Number of kernel iterations */
 
 	/*! This function needs to be defined so that it can be called from the pass manager. */
 	utl::Seconds prof( Dim const& ) override;
 
 	/*! This function needs to be defined so that it can be called from the pass manager. */
 	double ops( Dim const& ) override;
+
+	//Not working
+	//StudXPass1& operator =( StudXPass1 const& ) = delete;
 
 private :
 
@@ -145,8 +148,6 @@ utl::Seconds Stud4Pass1<Type_,Format_, W1,W2>::prof( utl::Dim const& dim )
 	  const size_t numResBytes = sizeof (Type) * M * N;
 	  const size_t numLhsBytes = sizeof (Type) * K * N;
 	  const size_t numRhsBytes = sizeof (Type) * K * M;
-
-	  //TODO ist B k * M oder N * M ???!!!???
 
 	  ocl::Buffer bufRes( context_, numResBytes, ocl::Buffer::WriteOnly );
 	  ocl::Buffer bufLhs( context_, numLhsBytes, ocl::Buffer::ReadOnly );

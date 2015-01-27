@@ -25,6 +25,7 @@
 #include <iostream>
 #include <ostream>
 #include <algorithm>
+#include <functional>
 
 #include <utl_assert.h>
 
@@ -59,6 +60,7 @@ public:
     __MatrixBase& operator = (value_type value) { std::fill(this->begin(), this->end(), value); return *this; }
     __MatrixBase& operator = (const __MatrixBase& m) { _vector = m._vector; _rows = m._rows; _cols = m._cols; return *this;}
     __MatrixBase& operator = (__MatrixBase&& m) { _vector = std::move(m._vector); _rows = m._rows; _cols = m._cols; return *this; }
+
 
 
 	bool operator==(const_reference value) const {
@@ -149,10 +151,10 @@ public:
 
     const std::vector<T>& vector() const { return this->_vector; }
 
-    const_iterator begin() const { return const_iterator( this->data() ); }
-    const_iterator end() const   { return const_iterator( this->data()+this->size() ); }
-    iterator begin() { return iterator ( this->data()  ); }
-    iterator end()   { return iterator( this->data()+this->size() ); }
+    const_iterator begin() const { return _vector.begin(); }
+    const_iterator end() const   { return _vector.end(); }
+    iterator begin() { return _vector.begin(); }
+    iterator end()   { return _vector.end(); }
 
 
     reference operator[](size_t index) { return _vector[index]; }
@@ -167,7 +169,7 @@ public:
     bool is_vector() const { return !is_scalar() && (_rows == 1 || _cols == 1); }
     bool is_matrix() const { return _rows > 1 && _cols > 1; }
 
-    ~__MatrixBase() = default;
+    virtual ~__MatrixBase() {};
 
 protected:
 
@@ -175,7 +177,7 @@ protected:
     __MatrixBase(size_t rows, size_t cols) :  _vector(rows*cols), _rows(rows), _cols(cols) {}
     __MatrixBase(const __MatrixBase& m) : _vector(m._vector), _rows(m._rows), _cols(m._cols) {}
     __MatrixBase(__MatrixBase&& m) : _vector(std::move(m._vector)), _rows(m._rows), _cols(m._cols) {}
-	__MatrixBase() : _vector(), _rows(0u), _cols(0u) {}
+		__MatrixBase() : _vector(), _rows(0u), _cols(0u) {}
 
 
 
@@ -199,21 +201,72 @@ struct column_major_tag { };
 ///  Marking row_major matrices.
 struct row_major_tag  { };
 
+template< typename >
+std::string getFormatName();
+
+template<>
+inline std::string getFormatName<column_major_tag>() { return "column_major"; }
+
+template<>
+inline std::string getFormatName<row_major_tag>() { return "row_major"; }
+
 }
 
 
 
 
 
-namespace utl{
+namespace utl
+{
 
 template <class T, class F>
 class Matrix : private __MatrixBase<T>
 {
     Matrix() = delete;
 };
+
+/**
+ * Calculate element wise absolut value.
+ */
+template< typename T, typename F >
+Matrix< T, F > abs( Matrix< T, F > const& m )
+{
+  Matrix< T, F > tmp( m.rows(), m.cols() );
+  
+  std::transform( m.begin(), m.end(), tmp.begin(), []( T x ){ return std::abs( x ); } );
+  
+  return std::move( tmp );
 }
 
+
+namespace detail {
+  
+template< typename T >
+struct isRowMajorImpl
+{
+  constexpr static bool const value =  false ;
+};
+
+
+template< typename T >
+struct isRowMajorImpl< Matrix< T, row_major_tag > >
+{
+  constexpr static bool const value = true ;
+};
+
+}
+
+
+template< typename Matrix >
+struct isRowMajor
+{
+  constexpr static bool const value = detail::isRowMajorImpl< Matrix >::value;
+};
+
+template< typename Matrix > 
+constexpr  bool const isRowMajor< Matrix >::value;
+
+}
 
 
 namespace utl{
@@ -617,11 +670,11 @@ public :
 
         Engine engine(device());
 
-        constexpr bool is_integral = std::is_integral<T>::value;
-        constexpr bool is_floating_point = std::is_floating_point<T>::value;
+/*        constexpr bool is_integral = std::is_integral<T>::value;
+        constexpr bool is_floating_point = std::is_floating_point<T>::value; */
 
-        uniform_int_distribution<Engine, Vector, is_integral>::run(engine, this->_vector , min, max);
-        uniform_real_distribution<Engine, Vector, is_floating_point>::run(engine, this->_vector, min, max);
+        uniform_int_distribution<Engine, Vector, std::is_integral<T>::value>::run(engine, this->_vector, min, max);
+        uniform_real_distribution<Engine, Vector, std::is_floating_point<T>::value>::run(engine, this->_vector, min, max);
     }
 };
 
@@ -712,7 +765,6 @@ public :
 		}
 	}
 };
-
 
 }
 #endif

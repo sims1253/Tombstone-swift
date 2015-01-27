@@ -4,11 +4,11 @@
 
 
 utl::ProfilePass::ProfilePass(const std::string& str, const utl::Dim& start, const utl::Dim& step, const utl::Dim& end, size_t __iter) :
-	_name(str), _start(start), _step(step), _end(end), _iter(__iter), _print_n(true), _print_t(true), _print_o(true), _print_p(true) , _countUp(true)
+	_name(str), _start(start), _step(step), _end(end), _iter(__iter), _print_n(true), _print_t(true), _print_o(true), _print_p(true), _elems(), _ops(), _times(), _perf(), _countUp(true)
 {}
 
 utl::ProfilePass::ProfilePass(const ProfilePass& p) :
-	_name(p._name), _start(p._start), _step(p._step), _end(p._end), _iter(p._iter), _print_n(p._print_n), _print_t(p._print_t), _print_o(p._print_o), _print_p(p._print_p) , _countUp(p._countUp)
+	_name(p._name), _start(p._start), _step(p._step), _end(p._end), _iter(p._iter), _print_n(p._print_n), _print_t(p._print_t), _print_o(p._print_o), _print_p(p._print_p), _elems(), _ops(), _times(), _perf(),  _countUp(p._countUp)
 {
 }
 
@@ -26,7 +26,7 @@ void utl::ProfilePass::run()
 
 	for(Dim i = _start; compare(i, _end); advance(i,_step))
 	{
-		//			TRUE_COMMENT("start : " << this->_start.toString() << ", _end : " << this->_end.toString() << ", _step = " << this->_step.toString() << ", i " << i.toString() << ", comp = "  << compare(i,_end));
+		//			__comment("start : " << this->_start.toString() << ", _end : " << this->_end.toString() << ", _step = " << this->_step.toString() << ", i " << i.toString() << ", comp = "  << compare(i,_end));
 
 		Seconds time = this->prof(i);
 		double op = this->ops(i);

@@ -75,7 +75,8 @@ public:
     Kernel(const std::string &kernel, const utl::Type &);
     Kernel(const Program&, const std::string &kernel, const utl::Type &);
     Kernel(const Kernel&) = delete;
-	~Kernel();
+		Kernel& operator =( Kernel const& ) = delete;
+		~Kernel();
     void create();
     bool created() const;
     void release();
@@ -84,54 +85,42 @@ public:
     void setProgram(const Program&);
     Context& context() const;
 
-    /*! \brief Executes this Kernel with arguments and returns an Event by which the execution can be tracked.
-      *
-      * The number of arguments must be equal to the number of arguments
-      * defined in the kernel function of this Kernel. Also the types
-      * must match.
-    */
-	template<typename ... Types>
-    ocl::Event operator()(const Queue &queue, const EventList& list, const Types& ... args)
-	{
-        //int pos = 0;
-        //if(sizeof...(args) > 0) setArg(pos, args ... );
-          pushArg( args... );
-        return callKernel(queue, list);
-	}
-
-    /*! \brief Executes this Kernel with arguments and returns an Event by which the execution can be tracked.
-      *
-      * The number of arguments must be equal to the number of arguments
-      * defined in the kernel function of this Kernel. Also the types
-      * must match.
-    */
-    template<typename ... Types>
-    ocl::Event operator()(const Queue &queue, const Types& ... args)
+    template< typename ... Types >
+    ocl::Event operator ()(Types const&... args)
     {
-        //int pos = 0;
-        //if(sizeof...(args) > 0) setArg(pos, args ... );
-        pushArg( args ... );
-        return callKernel(queue);
+      pushArg(args...);
+      return callKernel();
     }
 
     /*! \brief Executes this Kernel with arguments and returns an Event by which the execution can be tracked.
-      *
-      * The number of arguments must be equal to the number of arguments
-      * defined in the kernel function of this Kernel. Also the types
-      * must match.
+    *
+    * The number of arguments must be equal to the number of arguments
+    * defined in the kernel function of this Kernel. Also the types
+    * must match.
     */
     template<typename ... Types>
-    ocl::Event operator()(const Types& ... args)
+    ocl::Event operator()(const ocl::Queue &queue, const ocl::EventList& list, const Types& ... args)
     {
-        //int pos = 0;
-        //setArg(pos, args ... );
-        pushArg( args ... );
-        return callKernel();
+      //int pos = 0;
+      //if(sizeof...(args) > 0) setArg(pos, args ... );
+      pushArg(args...);
+      return callKernel(queue, list);
     }
 
-
-    ocl::Event operator()();
-
+    /*! \brief Executes this Kernel with arguments and returns an Event by which the execution can be tracked.
+    *
+    * The number of arguments must be equal to the number of arguments
+    * defined in the kernel function of this Kernel. Also the types
+    * must match.
+    */
+    template<typename ... Types>
+    ocl::Event operator()(const ocl::Queue &queue, const Types& ... args)
+    {
+      //int pos = 0;
+      //if(sizeof...(args) > 0) setArg(pos, args ... );
+      pushArg(args ...);
+      return callKernel(queue);
+    }
 
 	void setWorkSize(size_t lSizeX, size_t gSizeX);
 	void setWorkSize(size_t lSizeX, size_t lSizeY, size_t gSizeX, size_t gSizeY);
@@ -180,7 +169,7 @@ private:
     template< size_t NumArgs, size_t ArgIndex, typename Type, typename... Types >
     struct ArgPusher
     {
-      ArgPusher( Kernel& kernel, Type arg, Types... args )
+      ArgPusher( Kernel& kernel, Type const& arg, Types const&... args )
       {
         kernel.setArg( ArgIndex, arg );
         
@@ -191,7 +180,7 @@ private:
     template< size_t ArgIndex, typename Type>
     struct ArgPusher< 1, ArgIndex, Type >
     {
-      ArgPusher( Kernel& kernel, Type arg )
+      ArgPusher( Kernel& kernel, Type const& arg )
       {
         kernel.setArg( ArgIndex, arg );
         
@@ -214,6 +203,19 @@ private:
     std::vector<mem_loc> _memlocs;
 
 };
+
+/**
+* Round @c x to the next multiple of @c y.
+*
+* This is usefull if one wants to fully populate all wavefronts/warps.
+*/
+template< typename T >
+T roundNextMultiple( T x, T y )
+{
+ auto const tmp = x % y;
+
+ return tmp ? x + y - tmp : x;
+}
 
 }
 
